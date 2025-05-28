@@ -194,6 +194,23 @@ void ejecutarComando(char *comando) {
         return;
     }
 
+
+    if (numArgs > 0 && strcmp(args[0], "showmem") == 0) {
+        mostrarEstadoMemoria();
+        for (int i = 0; i < numArgs; i++) free(args[i]);
+        free(args);
+        return;
+    }
+
+
+    if (numArgs > 0 && strcmp(args[0], "compactmem") == 0) {
+        compactarMemoria();
+        printf("Memoria compactada.\n");
+        for (int i = 0; i < numArgs; i++) free(args[i]);
+        free(args);
+        return;
+    } 
+
     if (numArgs > 0 && strcmp(args[0], "fcfs") == 0) {
         if (listaProcesos.cabeza == NULL) {
             printf("No hay procesos en memoria.\n");
