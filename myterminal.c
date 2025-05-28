@@ -8,15 +8,28 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include "lista.h"
+#include "proceso.h"
+#include "memoria.h"
+#include "calendarizacionCPU.h"
 
 #define MAX_ARGS 100
 #define MAX_COMMANDS 5
+#define TAMANO_MEMORIA 1024 // Tamaño total de memoria simulada
+
+//CODIGO COMPILACION: gcc myterminal.c lista.c proceso.c memoria.c calendarizacionCPU.c -o myterminal 
+
+// Definición global de la lista de procesos
+struct Lista listaProcesos;
+const char* estrategia = "first"; // O la estrategia que prefieras
 
 void ejecutarComando(char *comando);
 void ejecutarComandoPipas(char *comandos[], int numComandos);
 char** dividirComando(char *comando, int *numArgs);
 
 int main() {
+
+    inicializarMemoria(TAMANO_MEMORIA);
+    
     char entrada[200];
     char *comandos[MAX_COMMANDS];
     int numComandos;
@@ -128,24 +141,123 @@ void ejecutarComando(char *comando) {
     int numArgs = 0;
     char **args = dividirComando(comando, &numArgs);
 
+    // Comando interno mkprocess
+    if (numArgs > 0 && strcmp(args[0], "mkprocess") == 0) {
+        if (numArgs != 4) {
+            printf("mkprocess <id> <burstTime> <bloques>\n");
+        } else {
+            // Verifica si ya existe el proceso
+            struct Nodo* temp = listaProcesos.cabeza;
+            int existe = 0;
+            while (temp) {
+                struct Proceso* p = (struct Proceso*)temp->dato;
+                if (strcmp(p->id, args[1]) == 0) {
+                    existe = 1;
+                    break;
+                }
+                temp = temp->siguiente;
+            }
+            if (existe) {
+                printf("Error: Ya existe un proceso con el id %s\n", args[1]);
+            } else {
+                struct Proceso* proc = crearProceso(args[1], atoi(args[2]), atoi(args[3]), estrategia);
+                if (!proc) {
+                    // crearProceso ya muestra el error y libera el bloque si falla
+                } else {
+                    agregarElemento(&listaProcesos, proc);
+                    printf("Proceso %s creado. Burst: %d, Memoria: %s\n", args[1], atoi(args[2]), args[3]);
+                }
+            }
+        }
+        for (int i = 0; i < numArgs; i++) free(args[i]);
+        free(args);
+        return;
+    }
+
+    // Comando interno listprocess
+    if (numArgs > 0 && strcmp(args[0], "listprocess") == 0) {
+        mostrarProcesos(&listaProcesos);
+        for (int i = 0; i < numArgs; i++) free(args[i]);
+        free(args);
+        return;
+    }
+
+    // Comando interno my_kill
+    if (numArgs > 0 && strcmp(args[0], "my_kill") == 0) {
+        if (numArgs != 2) {
+            printf("Uso: my_kill <idproceso>\n");
+        } else {
+            eliminarProcesoPorId(&listaProcesos, args[1]);
+        }
+        for (int i = 0; i < numArgs; i++) free(args[i]);
+        free(args);
+        return;
+    }
+
+    if (numArgs > 0 && strcmp(args[0], "fcfs") == 0) {
+        if (listaProcesos.cabeza == NULL) {
+            printf("No hay procesos en memoria.\n");
+        } else {
+            calcularTiemposFCFS(&listaProcesos);
+            mostrarResultados(&listaProcesos);
+        }
+        for (int i = 0; i < numArgs; i++) free(args[i]);
+        free(args);
+        return;
+    }
+
+    // Comando interno sjf
+    if (numArgs > 0 && strcmp(args[0], "sjf") == 0) {
+        if (listaProcesos.cabeza == NULL) {
+            printf("No hay procesos en memoria.\n");
+        } else {
+            calcularTiemposSJF(&listaProcesos);
+            mostrarResultados(&listaProcesos);
+        }
+        for (int i = 0; i < numArgs; i++) free(args[i]);
+        free(args);
+        return;
+    }
+
+    // Comando interno roundrobin
+    if (numArgs > 0 && strcmp(args[0], "roundrobin") == 0) {
+        if (listaProcesos.cabeza == NULL) {
+            printf("No hay procesos en memoria.\n");
+        } else {
+            int quantum = 10;
+            if (numArgs == 2) {
+                quantum = atoi(args[1]);
+            } else {
+                printf("¿Cuántos quantums quieres usar? [valor por defecto: 10]: ");
+                char buffer[16];
+                if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+                    int q = atoi(buffer);
+                    if (q > 0) quantum = q;
+                }
+            }
+            calcularTiemposRR(&listaProcesos, quantum);
+            mostrarResultados(&listaProcesos);
+        }
+        for (int i = 0; i < numArgs; i++) free(args[i]);
+        free(args);
+        return;
+    }
+
+    // Comando externo (por defecto)
     int pid = fork();
     if (pid < 0) {
         perror("Error al crear el proceso hijo");
     } else if (pid == 0) {
-     
         if (execvp(args[0], args) == -1) {
             perror("Error al ejecutar el comando");
         }
-        
         for (int i = 0; i < numArgs; i++) {
             free(args[i]);
         }
         free(args);
         exit(EXIT_FAILURE);
     } else {
-       
         wait(NULL);
-      
         for (int i = 0; i < numArgs; i++) {
             free(args[i]);
         }

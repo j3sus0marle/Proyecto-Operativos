@@ -4,27 +4,30 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-// Estructura para representar un bloque de memoria
 typedef struct BloqueMemoria {
-    void* direccion;
-    size_t tamano;
-    bool libre;
+    size_t direccionBase;         // Dirección base simulada (ej: offset)
+    size_t tamano;                // Tamaño del bloque
+    bool estado;                   // Estado: true = libre, false = ocupado
+    char idProceso[16];           // ID del proceso alojado ("" si libre)
     struct BloqueMemoria* siguiente;
 } BloqueMemoria;
 
-// Inicializa la memoria con un tamaño dado
-void inicializar_memoria(size_t tamano);
+// Inicializa la memoria simulada con un solo bloque libre de tamaño total
+void inicializarMemoria(size_t tamano);
 
-// Reserva un bloque de memoria de tamaño solicitado
-void* reservar_memoria(size_t tamano);
+// Solicita un bloque de memoria para un proceso (estrategia: "first", "best", "worst")
+bool asignarBloque(const char* idProceso, size_t tamano, const char* estrategia);
 
-// Libera un bloque de memoria previamente reservado
-void liberar_memoria(void* ptr);
+// Libera el bloque ocupado por el proceso con ese id
+bool liberarBloque(const char* idProceso);
 
-// Muestra el estado actual de la memoria (para depuración)
-void mostrar_estado_memoria(void);
+// Compacta bloques libres contiguos
+void compactarMemoria(void);
 
-// Libera toda la memoria simulada (para finalizar el programa)
-void liberar_memoria_total(void);
+// Muestra el estado actual de la memoria
+void mostrarEstadoMemoria(void);
 
-#endif // MEMORIA_H
+// Libera toda la memoria simulada
+void liberarMemoriaTotal(void);
+
+#endif
