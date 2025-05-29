@@ -17,16 +17,17 @@ void inicializarMemoria(size_t tamano) {
     memoriaTotal = tamano;
 }
 
-// Estrategias de asignación
 static BloqueMemoria* buscarBloque(size_t tamano, const char* estrategia) {
     BloqueMemoria *actual = listaBloques, *mejor = NULL;
     if (strcmp(estrategia, "first") == 0) {
+        // FIRST FIT: Devuelve el primer bloque libre suficientemente grande
         while (actual) {
             if (actual->estado && actual->tamano >= tamano)
                 return actual;
             actual = actual->siguiente;
         }
     } else if (strcmp(estrategia, "best") == 0) {
+        // BEST FIT: Busca el bloque libre más pequeño que sea suficiente
         size_t min = (size_t)-1;
         while (actual) {
             if (actual->estado && actual->tamano >= tamano && actual->tamano < min) {
@@ -37,6 +38,7 @@ static BloqueMemoria* buscarBloque(size_t tamano, const char* estrategia) {
         }
         return mejor;
     } else if (strcmp(estrategia, "worst") == 0) {
+        // WORST FIT: Busca el bloque libre más grande
         size_t max = 0;
         while (actual) {
             if (actual->estado && actual->tamano >= tamano && actual->tamano > max) {

@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+
 #include "lista.h"
 #include "proceso.h"
 #include "memoria.h"
@@ -16,20 +17,18 @@
 #define MAX_COMMANDS 5
 #define TAMANO_MEMORIA 1024 // Tamaño total de memoria simulada
 
-//CODIGO COMPILACION: gcc myterminal.c lista.c proceso.c memoria.c calendarizacionCPU.c -o myterminal 
+//comando compilacion: gcc myterminal.c memoria.c lista.c proceso.c calendarizacionCPU.c -o myterminal -lm
 
 // Definición global de la lista de procesos
 struct Lista listaProcesos;
-const char* estrategia = "first"; // O la estrategia que prefieras
 
 void ejecutarComando(char *comando);
 void ejecutarComandoPipas(char *comandos[], int numComandos);
 char** dividirComando(char *comando, int *numArgs);
 
 int main() {
-
     inicializarMemoria(TAMANO_MEMORIA);
-    
+
     char entrada[200];
     char *comandos[MAX_COMMANDS];
     int numComandos;
@@ -40,7 +39,7 @@ int main() {
             perror("Error al leer entrada");
             continue;
         }
-        entrada[strcspn(entrada, "\n")] = 0; 
+        entrada[strcspn(entrada, "\n")] = 0;
 
         if (strcmp(entrada, "exit") == 0) {
             printf("Adios\n");
@@ -51,7 +50,7 @@ int main() {
         char *inicio = entrada;
         int enComilla = 0;
         char *comActual = entrada;
-        
+
         for (char *p = entrada; *p; p++) {
             if (*p == '\'' || *p == '\"') {
                 enComilla = !enComilla;
@@ -59,15 +58,13 @@ int main() {
                 *p = '\0';
                 comandos[numComandos++] = comActual;
                 comActual = p + 1;
-                
                 while (*(comActual) == ' ') {
                     comActual++;
                 }
-                
                 if (numComandos >= MAX_COMMANDS) break;
             }
         }
-        
+
         if (comActual[0] != '\0') {
             comandos[numComandos++] = comActual;
         }
@@ -85,28 +82,23 @@ int main() {
 char** dividirComando(char *comando, int *numArgs) {
     char **args = malloc(MAX_ARGS * sizeof(char*));
     *numArgs = 0;
-    
+
     char *p = comando;
     int inArg = 0;
     char comilla = 0;
     char buffer[1024];
     int bufIdx = 0;
-    
+
     while (*p) {
-      
         if (comilla) {
             if (*p == comilla) {
                 comilla = 0;
             } else {
-               
                 buffer[bufIdx++] = *p;
             }
-        } 
-      
-        else {
+        } else {
             if (*p == ' ' || *p == '\t') {
                 if (inArg) {
-                    
                     buffer[bufIdx] = '\0';
                     args[(*numArgs)++] = strdup(buffer);
                     bufIdx = 0;
@@ -118,7 +110,6 @@ char** dividirComando(char *comando, int *numArgs) {
                     inArg = 1;
                 }
             } else {
-             
                 if (!inArg) {
                     inArg = 1;
                 }
@@ -127,12 +118,12 @@ char** dividirComando(char *comando, int *numArgs) {
         }
         p++;
     }
-    
+
     if (inArg) {
         buffer[bufIdx] = '\0';
         args[(*numArgs)++] = strdup(buffer);
     }
-    
+
     args[*numArgs] = NULL;
     return args;
 }
@@ -141,7 +132,7 @@ void ejecutarComando(char *comando) {
     int numArgs = 0;
     char **args = dividirComando(comando, &numArgs);
 
-    // Comando interno mkprocess
+    // mkprocess <id> <burstTime> <bloques>
     if (numArgs > 0 && strcmp(args[0], "mkprocess") == 0) {
         if (numArgs != 4) {
             printf("mkprocess <id> <burstTime> <bloques>\n");
@@ -160,13 +151,16 @@ void ejecutarComando(char *comando) {
             if (existe) {
                 printf("Error: Ya existe un proceso con el id %s\n", args[1]);
             } else {
-                struct Proceso* proc = crearProceso(args[1], atoi(args[2]), atoi(args[3]), estrategia);
-                if (!proc) {
-                    // crearProceso ya muestra el error y libera el bloque si falla
-                } else {
-                    agregarElemento(&listaProcesos, proc);
-                    printf("Proceso %s creado. Burst: %d, Memoria: %s\n", args[1], atoi(args[2]), args[3]);
-                }
+                struct Proceso* proc = malloc(sizeof(struct Proceso));
+                strncpy(proc->id, args[1], sizeof(proc->id)-1);
+                proc->id[sizeof(proc->id)-1] = '\0';
+                proc->burstTime = atoi(args[2]);
+                proc->bloques = atoi(args[3]);
+                proc->estado = NEW;
+                proc->waitingTime = 0;
+                proc->turnaroundTime = 0;
+                agregarElemento(&listaProcesos, proc);
+                printf("Proceso %s creado.\n", args[1]);
             }
         }
         for (int i = 0; i < numArgs; i++) free(args[i]);
@@ -174,15 +168,24 @@ void ejecutarComando(char *comando) {
         return;
     }
 
-    // Comando interno listprocess
+    // listprocess
     if (numArgs > 0 && strcmp(args[0], "listprocess") == 0) {
-        mostrarProcesos(&listaProcesos);
+        printf("ID\tBurst\tBloques\tEstado\n");
+        struct Nodo* temp = listaProcesos.cabeza;
+        while (temp) {
+            struct Proceso* p = (struct Proceso*)temp->dato;
+            const char* estadoStr = (p->estado == NEW) ? "NEW" :
+                                    (p->estado == READY) ? "READY" :
+                                    (p->estado == TERMINATED) ? "TERMINATED" : "UNKNOWN";
+            printf("%s\t%d\t%zu\t%s\n", p->id, p->burstTime, p->bloques, estadoStr);
+            temp = temp->siguiente;
+        }
         for (int i = 0; i < numArgs; i++) free(args[i]);
         free(args);
         return;
     }
 
-    // Comando interno my_kill
+    // my_kill <id>
     if (numArgs > 0 && strcmp(args[0], "my_kill") == 0) {
         if (numArgs != 2) {
             printf("Uso: my_kill <idproceso>\n");
@@ -194,23 +197,88 @@ void ejecutarComando(char *comando) {
         return;
     }
 
+    // alloc <id> <estrategia>
+    if (numArgs > 0 && strcmp(args[0], "alloc") == 0) {
+        if (numArgs != 3) {
+            printf("Uso: alloc <id> <estrategia>\n");
+        } else {
+            struct Nodo* temp = listaProcesos.cabeza;
+            struct Proceso* proc = NULL;
+            while (temp) {
+                struct Proceso* p = (struct Proceso*)temp->dato;
+                if (strcmp(p->id, args[1]) == 0) {
+                    proc = p;
+                    break;
+                }
+                temp = temp->siguiente;
+            }
+            if (!proc) {
+                printf("No existe el proceso %s\n", args[1]);
+            } else if (proc->estado != NEW) {
+                printf("El proceso %s no existe o ya esta cargado en memoria\n", args[1]);
+            } else {
+                if (asignarBloque(proc->id, proc->bloques, args[2])) {
+                    proc->estado = READY;
+                    printf("Proceso %s cargado a memoria\n", proc->id);
+                } else {
+                    printf("No se pudo cargar el proceso %s a memoria\n", proc->id);
+                }
+            }
+        }
+        for (int i = 0; i < numArgs; i++) free(args[i]);
+        free(args);
+        return;
+    }
 
-    if (numArgs > 0 && strcmp(args[0], "showmem") == 0) {
+    // mstatus
+    if (numArgs > 0 && strcmp(args[0], "mstatus") == 0) {
         mostrarEstadoMemoria();
         for (int i = 0; i < numArgs; i++) free(args[i]);
         free(args);
         return;
     }
 
-
-    if (numArgs > 0 && strcmp(args[0], "compactmem") == 0) {
+    // compact
+    if (numArgs > 0 && strcmp(args[0], "compact") == 0) {
         compactarMemoria();
         printf("Memoria compactada.\n");
         for (int i = 0; i < numArgs; i++) free(args[i]);
         free(args);
         return;
-    } 
+    }
 
+    // free <id>
+    if (numArgs > 0 && strcmp(args[0], "free") == 0) {
+        if (numArgs != 2) {
+            printf("Uso: free <id>\n");
+        } else {
+            struct Nodo* temp = listaProcesos.cabeza;
+            struct Proceso* proc = NULL;
+            while (temp) {
+                struct Proceso* p = (struct Proceso*)temp->dato;
+                if (strcmp(p->id, args[1]) == 0) {
+                    proc = p;
+                    break;
+                }
+                temp = temp->siguiente;
+            }
+            if (!proc) {
+                printf("No existe el proceso %s\n", args[1]);
+            } else if (proc->estado != READY) {
+                printf("El proceso %s no está en memoria\n", args[1]);
+            } else {
+                if (liberarBloque(proc->id)) {
+                    proc->estado = TERMINATED;
+                    printf("Proceso %s liberado de memoria (TERMINATED)\n", proc->id);
+                }
+            }
+        }
+        for (int i = 0; i < numArgs; i++) free(args[i]);
+        free(args);
+        return;
+    }
+
+    // fcfs
     if (numArgs > 0 && strcmp(args[0], "fcfs") == 0) {
         if (listaProcesos.cabeza == NULL) {
             printf("No hay procesos en memoria.\n");
@@ -223,7 +291,7 @@ void ejecutarComando(char *comando) {
         return;
     }
 
-    // Comando interno sjf
+    // sjf
     if (numArgs > 0 && strcmp(args[0], "sjf") == 0) {
         if (listaProcesos.cabeza == NULL) {
             printf("No hay procesos en memoria.\n");
@@ -236,7 +304,7 @@ void ejecutarComando(char *comando) {
         return;
     }
 
-    // Comando interno roundrobin
+    // roundrobin [quantum]
     if (numArgs > 0 && strcmp(args[0], "roundrobin") == 0) {
         if (listaProcesos.cabeza == NULL) {
             printf("No hay procesos en memoria.\n");
@@ -299,28 +367,21 @@ void ejecutarComandoPipas(char *comandos[], int numComandos) {
             perror("Error al crear el proceso hijo");
             exit(EXIT_FAILURE);
         } else if (pids[i] == 0) {
-          
             if (i > 0) {
-                
                 dup2(pipes[i - 1][0], STDIN_FILENO);
             }
             if (i < numComandos - 1) {
-                
                 dup2(pipes[i][1], STDOUT_FILENO);
             }
-
             for (int j = 0; j < numComandos - 1; j++) {
                 close(pipes[j][0]);
                 close(pipes[j][1]);
             }
-
             int numArgs = 0;
             char **args = dividirComando(comandos[i], &numArgs);
-            
             if (execvp(args[0], args) == -1) {
                 perror("Error al ejecutar el comando");
             }
-            
             for (int j = 0; j < numArgs; j++) {
                 free(args[j]);
             }
@@ -338,4 +399,3 @@ void ejecutarComandoPipas(char *comandos[], int numComandos) {
         waitpid(pids[i], NULL, 0);
     }
 }
-

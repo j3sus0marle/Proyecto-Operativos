@@ -3,13 +3,15 @@
 #include "lista.h"
 #include <stddef.h>
 
+enum EstadoProceso { NEW, READY, TERMINATED };
+
 struct Proceso {
     char id[32];
     int burstTime;
     int waitingTime;
     int turnaroundTime;
-    int estado;        // 0 = listo, 1 = ejecutando, 2 = terminado, etc.
-    size_t bloques;    // Cantidad de bloques ocupados
+    enum EstadoProceso estado;
+    size_t bloques;
 };
 
 struct Proceso* crearProceso(const char* id, int burstTime, size_t bloques, const char* estrategia);
