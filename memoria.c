@@ -95,12 +95,13 @@ bool liberarBloque(const char* idProceso) {
             actual->estado = true;
             actual->idProceso[0] = '\0';
             // Fusionar con siguiente si está estado
+            /*
             while (actual->siguiente && actual->siguiente->estado) {
                 BloqueMemoria* siguiente = actual->siguiente;
                 actual->tamano += siguiente->tamano;
                 actual->siguiente = siguiente->siguiente;
                 free(siguiente);
-            }
+            }*/
             return true;
         }
         actual = actual->siguiente;

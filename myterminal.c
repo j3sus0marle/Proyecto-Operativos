@@ -215,7 +215,7 @@ void ejecutarComando(char *comando) {
             if (!proc) {
                 printf("No existe el proceso %s\n", args[1]);
             } else if (proc->estado != NEW) {
-                printf("El proceso %s no existe o ya esta cargado en memoria\n", args[1]);
+                printf("El proceso %s ya esta cargado en memoria\n", args[1]);
             } else {
                 if (asignarBloque(proc->id, proc->bloques, args[2])) {
                     proc->estado = READY;
