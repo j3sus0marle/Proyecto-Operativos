@@ -111,18 +111,50 @@ bool liberarBloque(const char* idProceso) {
 
 void compactarMemoria(void) {
     BloqueMemoria* actual = listaBloques;
-    while (actual && actual->siguiente) {
-        if (actual->estado && actual->siguiente->estado) {
-            BloqueMemoria* siguiente = actual->siguiente;
-            actual->tamano += siguiente->tamano;
-            actual->siguiente = siguiente->siguiente;
-            free(siguiente);
+    BloqueMemoria* nuevaLista = NULL;
+    BloqueMemoria* ultimoOcupado = NULL;
+    size_t base = 0;
+    size_t memoriaOcupada = 0;
+
+    // 1. Recorre y mueve todos los bloques ocupados al inicio de la nueva lista
+    while (actual) {
+        if (!actual->estado) { // Ocupado
+            BloqueMemoria* nuevo = (BloqueMemoria*)malloc(sizeof(BloqueMemoria));
+            *nuevo = *actual;
+            nuevo->direccionBase = base;
+            nuevo->siguiente = NULL;
+            if (!nuevaLista) {
+                nuevaLista = nuevo;
+            } else {
+                ultimoOcupado->siguiente = nuevo;
+            }
+            ultimoOcupado = nuevo;
+            base += nuevo->tamano;
+            memoriaOcupada += nuevo->tamano;
+        }
+        actual = actual->siguiente;
+    }
+
+    // 2. Libera la lista original
+    liberarMemoriaTotal();
+
+    // 3. Crea un solo bloque libre al final si hay espacio
+    if (memoriaOcupada < memoriaTotal) {
+        BloqueMemoria* libre = (BloqueMemoria*)malloc(sizeof(BloqueMemoria));
+        libre->direccionBase = memoriaOcupada;
+        libre->tamano = memoriaTotal - memoriaOcupada;
+        libre->estado = true;
+        libre->idProceso[0] = '\0';
+        libre->siguiente = NULL;
+        if (ultimoOcupado) {
+            ultimoOcupado->siguiente = libre;
         } else {
-            actual = actual->siguiente;
+            nuevaLista = libre;
         }
     }
-}
 
+    listaBloques = nuevaLista;
+}
 void mostrarEstadoMemoria(void) {
     BloqueMemoria* actual = listaBloques;
     printf("Bloques de memoria:\n");
@@ -147,5 +179,5 @@ void liberarMemoriaTotal(void) {
         actual = siguiente;
     }
     listaBloques = NULL;
-    memoriaTotal = 0;
+   // memoriaTotal = 0;
 }

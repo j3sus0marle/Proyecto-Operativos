@@ -269,7 +269,7 @@ void ejecutarComando(char *comando) {
             } else {
                 if (liberarBloque(proc->id)) {
                     proc->estado = TERMINATED;
-                    printf("Proceso %s liberado de memoria (TERMINATED)\n", proc->id);
+                    printf("Proceso %s liberado de memoria\n", proc->id);
                 }
             }
         }
