@@ -1,0 +1,23 @@
+--- FREE
+
+NOMBRE  
+       free - libera un proceso cargado en memoria (estado ready)
+
+SINOPSIS  
+       free <ID>
+
+DESCRIPCIÓN  
+       El comando free elimina de la memoria al proceso especificado por su
+       ID.
+
+PARÁMETROS  
+       <ID>
+            ID del proceso a eliminar.
+
+FUNCIONAMIENTO
+        Al llamar este comando, el proceso en estado 'ready' pasará a estado 'terminated', liberando espacio en la memoria
+
+EJEMPLO
+
+       > free p15  
+       Proceso p15 liberado de memoria

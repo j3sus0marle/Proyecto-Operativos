@@ -1,0 +1,39 @@
+--- COMPACT
+
+NOMBRE  
+       compact - compacta la memoria contigua uniendo bloques libres 
+
+SINOPSIS  
+       compact
+
+DESCRIPCIÓN  
+       El comando compact realiza la compactación de memoria contigua, reorganizando los bloques  
+       ocupados hacia el inicio de la memoria y uniendo todos los espacios libres en un solo bloque contiguo  
+       al final. 
+
+FUNCIONAMIENTO  
+       - Reorganiza todos los procesos en estado 'ocupado' hacia las posiciones más bajas posibles en memoria,  
+        manteniendo su tamaño
+
+
+EJEMPLO DE USO  
+       compact  
+              Reorganiza la memoria moviendo procesos ocupados al inicio y agrupando memoria libre al final.
+              No recibe otros parametros y en caso de que la memoria ya esté compactada, no regresa error.
+
+    Antes de compactar:
+       Base    Límite  Tamaño  Estado      Proceso  
+       0       3       4       libre       -  
+       4       8       5       libre       -  
+       9       13      5       libre       -  
+       14      23      10      ocupado     p2  
+       24      33      10      ocupado     p5  
+       34      1023    990     libre       -
+
+    Despues de compactar:
+       Base    Límite  Tamaño  Estado      Proceso  
+       0       9       10      ocupado     p2  
+       10      19      10      ocupado     p5  
+       20      1023    1004    libre       -
+
+       

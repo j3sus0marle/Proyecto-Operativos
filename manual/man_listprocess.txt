@@ -1,0 +1,41 @@
+--- LISTPROCESS
+
+NOMBRE  
+       listprocess - muestra información de todos los procesos registrados en el sistema
+
+SINOPSIS  
+       listprocess
+
+DESCRIPCIÓN  
+       El comando listprocess imprime una lista de todos los procesos que han sido creados  
+       mediante el comando mkprocess, incluyendo tanto los que se encuentran en estado 'new',  
+       como los que están en 'ready' o en cualquier otro estado definido en el simulador.
+
+       Por cada proceso se muestra la siguiente información:
+
+       - ID del proceso (identificador numérico único)
+       - Burst time (tiempo requerido de CPU)
+       - Bloques ocupados (memoria asignada o solicitada)
+       - Estado actual del proceso (new, ready, running, terminated, etc.)
+
+FUNCIONAMIENTO  
+       Al ejecutarse, listprocess imprime una tabla de los procesos qque se encuentren en el ordenador.
+       El estado del proceso refleja la etapa del ciclo de vida en la que se encuentra:  
+
+       - new: ha sido creado pero aún no se ha asignado a memoria  
+       - ready: está listo para ejecutarse, en espera de CPU  
+       - terminated: finalizado o eliminado  
+
+EJEMPLOS  
+       listprocess  
+              Muestra todos los procesos del sistema, con su estado, tiempo de CPU y bloques de memoria.
+
+SALIDA DE EJEMPLO  
+        ID      Burst   Bloques Estado
+        p2      10      10      NEW
+        p1      2       4       TERMINATED
+        p3      10      5       TERMINATED
+        p4      15      10      NEW  
+
+
+

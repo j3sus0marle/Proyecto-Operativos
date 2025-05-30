@@ -1,0 +1,54 @@
+--- ROUNDROBIN
+
+NOMBRE  
+       roundrobin - simula la planificación de procesos con el algoritmo Round Robin
+
+SINOPSIS  
+       roundrobin
+
+DESCRIPCIÓN  
+       El comando `roundrobin` ejecuta la planificación de procesos en estado `ready`
+       utilizando el algoritmo Round Robin, que asigna la CPU a cada proceso por un período
+       fijo de tiempo denominado quantum. Si un proceso no finaliza en su quantum, es enviado
+       nuevamente al final de la ready queue
+
+       El quantum puede ser especificado por el usuario; si no se ingresa ningún valor, el valor
+       por defecto será de 10 quantums
+       Se muestran dos secciones principales:
+       Orden de ejecución:
+          - Indica en qué momento cada proceso entra y sale del CPU.
+          - Se señala si el proceso ha terminado o cuántas unidades le restan.
+
+       Resultados:
+          - ID: identificador del proceso  
+          - Burst: tiempo total requerido por el proceso  
+          - Waiting: tiempo total que el proceso esperó en cola  
+          - Turnaround: tiempo desde su entrada en ready hasta su finalización  
+          - Promedios de waiting y turnaround al final.
+
+FUNCIONAMIENTO  
+       - Solicita al usuario un valor para el quantum.  
+       - Procesa los procesos en la cola uno por uno, otorgando CPU por un máximo del quantum. Si el burst restante 
+       del proceso es mayor al quantum, el proceso es reinsertado al final de la cola, si el burst restante es menor 
+       o igual al quantum, el proceso finaliza y se calcula su turnaround y waiting time.  
+
+EJEMPLO DE SALIDA
+
+       ¿Cuántos quantums quieres usar? [valor por defecto: 10]: 10
+
+       [Round Robin] Orden de entrada y salida al CPU:  
+       Proceso p8 entra al CPU en t=0  
+       Proceso p8 sale del CPU en t=10 (terminado)  
+       Proceso p11 entra al CPU en t=10  
+       Proceso p11 sale del CPU en t=20 (restante: 5)  
+       Proceso p11 entra al CPU en t=20  
+       Proceso p11 sale del CPU en t=25 (terminado)  
+
+       Resultados:  
+       ID      Burst   Waiting Turnaround
+         
+       p8      10      0       10  
+       p11     15      10      25  
+
+       Promedio Waiting Time: 5.00  
+       Promedio Turnaround Time: 17.50  

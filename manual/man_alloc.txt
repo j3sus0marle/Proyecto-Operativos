@@ -1,0 +1,42 @@
+--- ALLOC                     
+
+NOMBRE  
+       alloc - asigna un proceso en estado 'new' a la memoria, colocándolo en estado 'ready'
+
+SINOPSIS  
+       alloc <identificador> <estrategia>
+
+DESCRIPCIÓN  
+       El comando alloc permite simular la carga de un proceso en estado 'new'
+       en memoria principal, usando una estrategia de asignación de memoria especificada.  
+       El proceso pasa al estado 'ready' y queda listo para ser ejecutado por la CPU.
+
+       Este comando toma dos argumentos:
+
+       <identificador>
+              Número entero que identifica al proceso previamente creado con el comando mkprocess.  
+              El proceso debe encontrarse en estado 'new'. 
+
+       <estrategia>
+              Define el método de asignación de memoria a utilizar. Las estrategias disponibles son:
+
+              First    - se asigna el primer bloque de memoria libre que sea lo suficientemente grande.
+              Best     - Se asigna el bloque libre más pequeño que sea lo suficientemente grande.
+              Worst    - Se asigna el bloque libre más grande disponible.
+
+FUNCIONAMIENTO  
+       El comando buscará un bloque de memoria adecuado según la estrategia especificada.  
+       Si se encuentra un bloque válido, se asignará al proceso, que cambiará su estado a 'ready'.  
+
+EJEMPLOS  
+       alloc p1 First  
+              Carga el proceso con ID p1 a memoria usando la estrategia de First Fit
+
+       alloc p2 Best  
+              Intenta cargar el proceso p2 utilizando la estrategia de Best Fit
+
+       alloc p3 Worst  
+              Asigna memoria al proceso p3 utilizando la estrategia de Worst Fit
+
+
+

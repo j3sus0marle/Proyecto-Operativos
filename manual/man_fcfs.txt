@@ -1,0 +1,46 @@
+--- FCFS              
+
+NOMBRE  
+       fcfs - simula el algoritmo de planificación FCFS (First Come - First Served)
+
+SINOPSIS  
+       fcfs
+
+DESCRIPCIÓN  
+       El comando fcfs ejecuta la planificación de procesos en la ready queue (que esten en estado ready) usando  
+       el algoritmo FCFS. Este algoritmo asigna la CPU a los procesos en  el orden en el que fueron cargados a 
+       memoria hasta que cada proceso termine su ráfaga de CPU (burst time).
+       Se muestran dos secciones principales:
+
+        Orden de ejecución:
+          - Indica en qué tiempo entra y sale cada proceso de la CPU.
+
+        Resultados:
+          - ID: identificador del proceso  
+          - Burst: ráfaga de CPU requerida  
+          - Waiting: tiempo de espera (tiempo antes de entrar a CPU)  
+          - Turnaround: tiempo total desde que el proceso está listo hasta que termina  
+          - Promedios generales al final
+    
+FUNCIONAMIENTO  
+       - Calcula el orden de ejecución según el orden de carga a la ready queue, luego asigna en el 
+       CPU secuencialmente a cada proceso hasta que termine su burst  
+
+EJEMPLO 
+
+       [FCFS] Orden de entrada y salida al CPU:  
+       Proceso p2 entra al CPU en t=0  
+       Proceso p2 sale del CPU en t=10  
+       Proceso p5 entra al CPU en t=10  
+       Proceso p5 sale del CPU en t=20  
+
+       Resultados:  
+       ID      Burst   Waiting Turnaround  
+       p2      10      0       10  
+       p1      2       0       2  
+       p3      10      2       12  
+       p5      10      10      20  
+
+       Promedio Waiting Time: 3.00  
+       Promedio Turnaround Time: 11.00  
+

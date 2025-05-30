@@ -1,0 +1,34 @@
+--- MSTATUS
+
+NOMBRE  
+       mstatus - muestra el estado actual de la memoria principal
+
+SINOPSIS  
+       mstatus
+
+DESCRIPCIÓN  
+       El comando mstatus permite mostrar una tabla que representa el estado actual de la memoria del sistema.  
+       Muestra todas las particiones de memoria existentes, tanto libres como ocupadas,  
+       incluyendo su base, límite, tamaño, estado y proceso asignado.
+       La salida es una tabla con el siguiente formato:
+
+       - Base: Dirección base de la partición (inicio en memoria)
+       - Límite: Dirección límite (última dirección incluida en el bloque)
+       - Tamaño: Tamaño total de la partición (en bloques)
+       - Estado: 'libre' u 'ocupado'
+       - Proceso: ID del proceso asignado o '-' si está libre
+       
+FUNCIONAMIENTO  
+       El sistema mantiene una lista de bloques de memoria ordenados por dirección base.  
+       Cada bloque puede estar libre u ocupado por un proceso. 
+
+EJEMPLO
+       Base    Limite  Tamaño  Estado      Proceso  
+       0       3       4       libre       -  
+       4       8       5       libre       -  
+       9       13      5       libre       -  
+       14      23      10      ocupado     p2  
+       24      33      10      ocupado     p5  
+       34      1023    990     libre       -
+
+ 

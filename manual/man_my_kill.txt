@@ -1,0 +1,23 @@
+MY_KILL(1)                   Simulador de Procesos                   MY_KILL(1)
+
+NOMBRE  
+       my_kill - elimina un proceso de la ready queue
+
+SINOPSIS  
+       my_kill <identificador>
+
+DESCRIPCIÓN  
+       El comando my_kill elimina un proceso que se encuentre en la ready queue, liberando los recursos de memoria que ocupaba.
+
+       Este comando toma estos argumentos:
+
+       <identificador>
+              Número entero que identifica al proceso a eliminar. 
+
+FUNCIONAMIENTO  
+       Al ejecutarse, my_kill verifica que el proceso exista y esté en la ready queue. En caso 
+       de existir, este se liberará de la memoria
+EJEMPLOS  
+       my_kill p1  
+              Elimina el proceso con ID p1 de la cola 
+

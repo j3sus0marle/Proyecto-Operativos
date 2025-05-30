@@ -1,0 +1,34 @@
+----> MKPROCESS
+
+NOMBRE  
+       mkprocess - crea un nuevo proceso en estado 'new' para el sistema de simulación
+
+SINOPSIS  
+       mkprocess <identificador> <burst_time> <bloques>
+
+DESCRIPCIÓN  
+       El comando mkprocess permite simular la creación de un nuevo proceso dentro del sistema.  
+       Este proceso queda en estado 'new' tras su creación.
+
+       El comando toma tres argumentos:
+
+       <identificador>
+              Número entero positivo que identifica de forma única al proceso dentro del sistema.  
+              No se permite la duplicación de identificadores; si ya existe un proceso con el mismo  
+              identificador, se mostrará un mensaje de error.
+
+       <burst_time>
+              Tiempo estimado que el proceso utilizará la CPU. Debe ser un número entero positivo.  
+              Este valor se usa en los algoritmos de planificación para calcular su duración de ejecución.
+
+       <bloques>
+              Número de bloques de memoria requeridos por el proceso. También debe ser un entero positivo.  
+              Se utilizará para simular el uso de recursos de memoria del sistema.
+
+FUNCIONAMIENTO  
+       Al invocar mkprocess, se crea un nuevo proceso que se añade a la lista   de procesos en estado 'new'. Este proceso puede luego ser gestionado por los algoritmos de planificación  
+       (como FCFS, SJF o Round Robin).
+
+EJEMPLOS  
+       > mkprocess p1 25 8  
+              Crea un nuevo proceso con ID 101, que requiere 10 unidades de CPU y ocupa 9 bloques de memoria.

@@ -12,12 +12,13 @@
 #include "proceso.h"
 #include "memoria.h"
 #include "calendarizacionCPU.h"
+#include "manual.h"
 
 #define MAX_ARGS 100
 #define MAX_COMMANDS 5
 #define TAMANO_MEMORIA 1024 // Tamaño total de memoria simulada
 
-//comando compilacion: gcc myterminal.c memoria.c lista.c proceso.c calendarizacionCPU.c -o myterminal -lm
+// gcc myterminal.c memoria.c lista.c proceso.c calendarizacionCPU.c manual.c -o myterminal -lm
 
 // Definición global de la lista de procesos
 struct Lista listaProcesos;
@@ -327,6 +328,16 @@ void ejecutarComando(char *comando) {
         free(args);
         return;
     }
+    if (numArgs > 0 && strcmp(args[0], "manual") == 0) {
+    if (numArgs != 2) {
+        printf("Uso: manual <comando>\n");
+    } else {
+        mostrar_manual(args[1]);
+    }
+    for (int i = 0; i < numArgs; i++) free(args[i]);
+    free(args);
+    return;
+}
 
     // Comando externo (por defecto)
     int pid = fork();
@@ -349,6 +360,7 @@ void ejecutarComando(char *comando) {
         free(args);
     }
 }
+
 
 void ejecutarComandoPipas(char *comandos[], int numComandos) {
     int pipes[MAX_COMMANDS - 1][2];

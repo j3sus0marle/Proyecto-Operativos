@@ -1,0 +1,52 @@
+--- SJF
+
+NOMBRE  
+       sjf - simula la planificación de procesos con el algoritmo SJF (Shortest Job First)
+
+SINOPSIS  
+       sjf
+
+DESCRIPCIÓN  
+       El comando sjf ejecuta la planificación de los procesos en estado 'ready'  
+       utilizando el algoritmo SJF. Consiste en seleccionar primero el proceso que tenga el menor tiempo  
+       de ráfaga (burst time), minimizando así el tiempo promedio de espera.
+       Se muestran dos secciones principales:
+
+        Orden de ejecución:
+          - Indica en qué tiempo entra y sale cada proceso de la CPU.
+
+        Resultados:
+          - ID: identificador del proceso  
+          - Burst: ráfaga de CPU requerida  
+          - Waiting: tiempo de espera (tiempo antes de entrar a CPU)  
+          - Turnaround: tiempo total desde que el proceso está listo hasta que termina  
+          - Promedios generales al final
+
+
+FUNCIONAMIENTO  
+       - Ordena los procesos en estado ready según su burst time (de menor a mayor). Ejecutando cada proceso 
+       para despues pasar al siguiente
+
+
+EJEMPLO
+
+       [SJF] Orden de entrada y salida al CPU:  
+       Proceso p7 entra al CPU en t=0  
+       Proceso p7 sale del CPU en t=5  
+       Proceso p6 entra al CPU en t=5  
+       Proceso p6 sale del CPU en t=15  
+       Proceso p4 entra al CPU en t=15  
+       Proceso p4 sale del CPU en t=30  
+
+       Resultados:  
+       ID      Burst   Waiting Turnaround  
+       p2      10      0       10  
+       p1      2       0       2  
+       p3      10      2       12  
+       p4      15      15      30  
+       p5      10      10      20  
+       p6      10      5       15  
+       p7      5       0       5  
+
+       Promedio Waiting Time: 4.57  
+       Promedio Turnaround Time: 13.43  
